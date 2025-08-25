@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neighborhood Pickup</title>
+</head>
+<body>
+  <h1>Neighborhood Pickup Service</h1>
+
+  <section id="cart">
+    <h2>Cart</h2>
+    <input id="senderId" placeholder="Sender ID" value="s1">
+    <input id="itemName" placeholder="Item name">
+    <input id="itemQty" type="number" placeholder="Qty" value="1">
+    <button onclick="addItem()">Add Item</button>
+    <button onclick="loadCart()">Load Cart</button>
+    <ul id="cartItems"></ul>
+  </section>
+
+  <section id="receiver">
+    <h2>Register Receiver</h2>
+    <input id="receiverId" placeholder="Receiver ID">
+    <input id="receiverLat" placeholder="Lat">
+    <input id="receiverLon" placeholder="Lon">
+    <button onclick="registerReceiver()">Register</button>
+  </section>
+
+  <section id="nearby">
+    <h2>Nearby Receivers</h2>
+    <input id="queryLat" placeholder="Lat">
+    <input id="queryLon" placeholder="Lon">
+    <input id="queryRadius" placeholder="Radius km" value="5">
+    <button onclick="findNearby()">Find</button>
+    <ul id="nearbyList"></ul>
+  </section>
+
+  <script>
+    async function addItem() {
+      const sender = document.getElementById('senderId').value;
+      const name = document.getElementById('itemName').value;
+      const quantity = parseInt(document.getElementById('itemQty').value);
+      await fetch(`/senders/${sender}/cart/items`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, quantity})
+      });
+      loadCart();
+    }
+
+    async function loadCart() {
+      const sender = document.getElementById('senderId').value;
+      const resp = await fetch(`/senders/${sender}/cart`);
+      const items = await resp.json();
+      const ul = document.getElementById('cartItems');
+      ul.innerHTML = '';
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.quantity} x ${item.name}`;
+        ul.appendChild(li);
+      });
+    }
+
+    async function registerReceiver() {
+      const id = document.getElementById('receiverId').value;
+      const lat = parseFloat(document.getElementById('receiverLat').value);
+      const lon = parseFloat(document.getElementById('receiverLon').value);
+      await fetch('/receivers', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, lat, lon})
+      });
+    }
+
+    async function findNearby() {
+      const lat = parseFloat(document.getElementById('queryLat').value);
+      const lon = parseFloat(document.getElementById('queryLon').value);
+      const radius_km = parseFloat(document.getElementById('queryRadius').value);
+      const resp = await fetch(`/receivers/nearby?lat=${lat}&lon=${lon}&radius_km=${radius_km}`);
+      const receivers = await resp.json();
+      const ul = document.getElementById('nearbyList');
+      ul.innerHTML = '';
+      receivers.forEach(r => {
+        const li = document.createElement('li');
+        li.textContent = `${r.id} (${r.lat}, ${r.lon})`;
+        ul.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
