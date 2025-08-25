@@ -24,3 +24,4 @@ def test_index_page_served():
     response = client.get("/")
     assert response.status_code == 200
     assert "Neighborhood Pickup" in response.text
+
