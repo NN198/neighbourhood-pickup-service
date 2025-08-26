@@ -1,6 +1,5 @@
 # Neighbourhood Pickup Service
 
-This repository contains a minimal FastAPI application that models key pieces of a neighbourhood pickup service. Senders can build grocery carts and find nearby receivers who can deliver them.
 
 ## Setup
 
@@ -8,6 +7,7 @@ This repository contains a minimal FastAPI application that models key pieces of
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000 --app-dir src
 ```
+
 
 
 ## Running Tests
