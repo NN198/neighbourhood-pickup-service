@@ -18,3 +18,10 @@ def test_nearby_receivers():
     data = {r["id"] for r in response.json()}
     assert "r1" in data
     assert "r2" not in data
+
+
+def test_index_page_served():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Neighborhood Pickup" in response.text
+
