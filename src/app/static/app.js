@@ -12,6 +12,18 @@ function App() {
 
   async function addItem() {
     await fetch(`/shoppers/${shopperId}/cart/items`, {
+      
+  const [senderId, setSenderId] = useState('s1');
+  const [itemName, setItemName] = useState('');
+  const [itemQty, setItemQty] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
+  const [receiver, setReceiver] = useState({ id: '', lat: '', lon: '' });
+  const [query, setQuery] = useState({ lat: '', lon: '', radius_km: 5 });
+  const [nearby, setNearby] = useState([]);
+
+  async function addItem() {
+    await fetch(`/senders/${senderId}/cart/items`, {
+
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: itemName, quantity: parseInt(itemQty) }),
@@ -21,6 +33,7 @@ function App() {
 
   async function loadCart() {
     const resp = await fetch(`/shoppers/${shopperId}/cart`);
+    const resp = await fetch(`/senders/${senderId}/cart`);
     const items = await resp.json();
     setCartItems(items);
   }
@@ -33,6 +46,15 @@ function App() {
         id: helper.id,
         lat: parseFloat(helper.lat),
         lon: parseFloat(helper.lon),
+        
+  async function registerReceiver() {
+    await fetch('/receivers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: receiver.id,
+        lat: parseFloat(receiver.lat),
+        lon: parseFloat(receiver.lon),
       }),
     });
   }
@@ -44,6 +66,7 @@ function App() {
       radius_km: query.radius_km,
     });
     const resp = await fetch(`/helpers/nearby?${params.toString()}`);
+    const resp = await fetch(`/receivers/nearby?${params.toString()}`);
     const recs = await resp.json();
     setNearby(recs);
   }
@@ -59,9 +82,11 @@ function App() {
     await loadHelpers();
   }
 
+
   return (
     React.createElement('div', null,
       React.createElement('h1', null, 'Neighborhood Pickup Service'),
+
 
       React.createElement('button', { onClick: seed }, 'Seed Dummy Data'),
 
@@ -71,6 +96,12 @@ function App() {
           value: shopperId,
           onChange: e => setShopperId(e.target.value),
           placeholder: 'Shopper ID'
+      React.createElement('section', null,
+        React.createElement('h2', null, 'Cart'),
+        React.createElement('input', {
+          value: senderId,
+          onChange: e => setSenderId(e.target.value),
+          placeholder: 'Sender ID'
         }),
         React.createElement('input', {
           value: itemName,
@@ -124,6 +155,27 @@ function App() {
 
       React.createElement('section', null,
         React.createElement('h2', null, 'Nearby Helpers'),
+        React.createElement('h2', null, 'Register Receiver'),
+        React.createElement('input', {
+          value: receiver.id,
+          onChange: e => setReceiver({ ...receiver, id: e.target.value }),
+          placeholder: 'Receiver ID'
+        }),
+        React.createElement('input', {
+          value: receiver.lat,
+          onChange: e => setReceiver({ ...receiver, lat: e.target.value }),
+          placeholder: 'Lat'
+        }),
+        React.createElement('input', {
+          value: receiver.lon,
+          onChange: e => setReceiver({ ...receiver, lon: e.target.value }),
+          placeholder: 'Lon'
+        }),
+        React.createElement('button', { onClick: registerReceiver }, 'Register')
+      ),
+
+      React.createElement('section', null,
+        React.createElement('h2', null, 'Nearby Receivers'),
         React.createElement('input', {
           value: query.lat,
           onChange: e => setQuery({ ...query, lat: e.target.value }),

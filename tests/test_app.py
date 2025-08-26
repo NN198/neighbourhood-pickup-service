@@ -28,9 +28,23 @@ def test_seed_endpoint_populates_data():
     helpers_resp = client.get("/helpers")
     ids = {h["id"] for h in helpers_resp.json()}
     assert {"bob", "charlie"} <= ids
+    response = client.post("/senders/s1/cart/items", json={"name": "apple", "quantity": 2})
+    assert response.status_code == 200
+    response = client.get("/senders/s1/cart")
+    assert response.json() == [{"name": "apple", "quantity": 2}]
+
+
+def test_nearby_receivers():
+    client.post("/receivers", json={"id": "r1", "lat": 10.0, "lon": 10.0})
+    client.post("/receivers", json={"id": "r2", "lat": 50.0, "lon": 50.0})
+    response = client.get("/receivers/nearby", params={"lat": 10.1, "lon": 10.1, "radius_km": 20})
+    data = {r["id"] for r in response.json()}
+    assert "r1" in data
+    assert "r2" not in data
 
 
 def test_index_page_served():
     response = client.get("/")
     assert response.status_code == 200
     assert "Neighborhood Pickup" in response.text
+
