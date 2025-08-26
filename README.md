@@ -9,7 +9,6 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000 --app-dir src
 ```
 
-Once running, open `http://localhost:8000/` in a browser to use the React-based frontend for adding cart items and browsing nearby receivers.
 
 ## Running Tests
 
